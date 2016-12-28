@@ -5,7 +5,7 @@ MAINTAINER Cristian Lozano "criloz@nebtex.com"
 ENV CONSUL_VERSION=0.7.2
 
 # This is the release of tzk-daemon to pull in.
-ENV TZKD_VERSION=0.1.0
+ENV TZKD_VERSION=0.1.1
 
 # This is the release of https://github.com/hashicorp/docker-base to pull in order
 # to provide HashiCorp-built versions of basic utilities like dumb-init and gosu.
@@ -14,14 +14,19 @@ ENV DOCKER_BASE_VERSION=0.0.4
 # Create a consul user and group first so the IDs get set the same way, even as
 # the rest of this may change over time.
 RUN useradd -ms /bin/bash consul
-RUN useradd -ms /bin/bash tzk
 
 RUN apt-get update -y
-
 # Set up Consul.
-RUN apt-get install libpcap-dev ca-certificates unzip curl wget curl -y && \
+RUN apt-get install -y  libpcap-dev libcap2-bin ca-certificates unzip curl wget && \
     wget https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip && \
     unzip -d /bin consul_${CONSUL_VERSION}_linux_amd64.zip
+
+# Install Tinc and utility packages
+RUN echo "deb http://http.debian.net/debian experimental main" >> /etc/apt/sources.list && \
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y net-tools supervisor curl && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y -t experimental tinc
+
 
 # The /consul/data dir is used by Consul to store state. The agent will be started
 # with /consul/config as the configuration directory so you can add additional
@@ -29,16 +34,10 @@ RUN apt-get install libpcap-dev ca-certificates unzip curl wget curl -y && \
 RUN mkdir -p /consul/data && \
     mkdir -p /consul/config && \
     chown -R consul:consul /consul
-    
+
+ 
 # Remove SUID programs
 RUN for i in `find / -perm +6000 -type f 2>/dev/null`; do chmod a-s $i; done
-
-# Install Tinc and utility packages
-RUN echo "deb http://http.debian.net/debian experimental main" >> /etc/apt/sources.list && \
-    apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y net-tools supervisor curl && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y -t experimental tinc && \
-    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # installing unzip sigil
 RUN apt-get install liblzo2-2 -y && \
@@ -54,9 +53,6 @@ RUN curl -LO https://github.com/mholt/caddy/releases/download/v0.9.3/caddy_linux
    chown root:root /usr/local/bin/caddy && \
    chmod 755 /usr/local/bin/caddy && \
    setcap 'cap_net_bind_service=+ep' /usr/local/bin/caddy &&\
-   groupadd -g 33 www-data &&\
-   useradd -g www-data --no-user-group --home-dir /var/www --no-create-home \
-   --shell /usr/sbin/nologin --system --uid 33 www-data &&\
    mkdir /etc/caddy &&\
    chown -R root:www-data /etc/caddy &&\
    mkdir /etc/ssl/caddy &&\
@@ -67,9 +63,9 @@ RUN curl -LO https://github.com/mholt/caddy/releases/download/v0.9.3/caddy_linux
    chmod 555 /var/www
 
 # install tzk daemon
-RUN curl -LO https://github.com/NebTex/tzk-daemon/releases/download/v{TZKD_VERSION}/tzkd_linux_amd64 && \
+RUN wget https://github.com/NebTex/tzk-daemon/releases/download/v${TZKD_VERSION}/tzkd_linux_amd64 && \
     cp tzkd_linux_amd64 /usr/local/bin/tzkd && \
-    chmod 755 /usr/local/bin/tzkd && \
+    chmod +x /usr/local/bin/tzkd && \
     mkdir -p /etc/tzk.d
 
 ADD templates/ /templates
@@ -103,6 +99,6 @@ EXPOSE 8301 8301/udp 8302 8302/udp
 EXPOSE 8400 8500 8600 8600/udp
 
 ADD entrypoint.sh /bin/entrypoint.sh
-chmod +x /bin/entrypoint.sh
+RUN chmod +x /bin/entrypoint.sh
 
 ENTRYPOINT [ "/bin/entrypoint.sh" ]
