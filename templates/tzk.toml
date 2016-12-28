@@ -1,0 +1,16 @@
+[Vpn]
+Name = "${VPNName:-tzk}"
+PublicKeyFile = "/etc/tinc/${VPNName:-tzk}/ed25519_key.pub"
+ExecRestart = "supervisorctl restart tinc"
+Subnet = "${Subnet:-10.187.0.0/16}"
+
+[Consul]
+{{ if eq "${master:-false}" "true" }}
+Address = "127.0.0.1:8500"
+Scheme = "http"{{ else }}
+Address = "${ConsulHost:?}"
+Scheme = "https"{{ end }}
+Token = "${ACLToken:?}"
+
+[Kubernetes]
+ServiceCIDR = "${KubernetesServiceCIDR:-10.96.0.0/12}"

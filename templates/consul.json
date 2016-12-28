@@ -1,0 +1,13 @@
+{
+  "datacenter": "dc1",
+  "acl_datacenter": "dc1",
+  "acl_default_policy": "deny",
+  "acl_down_policy": "deny",
+  "acl_master_token": "${ACLToken:?}",
+  "data_dir": "/consul/data",
+  "log_level": "INFO",
+  "node_name": "${NodeName:?}",
+  "server": true,
+  "bootstrap": true,
+  "ui": true
+}

@@ -1,0 +1,5 @@
+${ConsulHost:?}
+
+proxy / localhost:8500 {
+    transparent
+}
