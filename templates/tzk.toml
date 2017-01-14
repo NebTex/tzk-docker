@@ -3,6 +3,7 @@ Name = "${VPNName:-tzk}"
 PublicKeyFile = "/etc/tinc/${VPNName:-tzk}/ed25519_key.pub"
 ExecRestart = "/usr/bin/supervisorctl -s http://localhost:9001  restart tinc"
 Subnet = "${Subnet:-10.187.0.0/16}"
+NodeIP = "${NodeIP:-}"
 
 [Consul]
 {{ if eq "${master:-false}" "true" }}
@@ -12,5 +13,3 @@ Address = "${ConsulHost:?}"
 Scheme = "https"{{ end }}
 Token = "${ACLToken:?}"
 
-[Kubernetes]
-ServiceCIDR = "${KubernetesServiceCIDR:-10.96.0.0/12}"

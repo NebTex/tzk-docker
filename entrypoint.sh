@@ -26,7 +26,7 @@ chown consul:consul -R /consul
 sigil -p -i "$(cat /templates/tzk.toml)" \
     VPNName=${VPNName:-tzk} ACLToken=${ACLToken:?} master=${master:-false} \
     Subnet=${Subnet:-10.187.0.0/16} ConsulHost=${ConsulHost:?} \
-    KubernetesServiceCIDR=${KubernetesServiceCIDR:-10.96.0.0/12} \
+    NodeIP=${NodeIP:-} \
     > /etc/tzk.d/tzk.toml
 
 sigil -p -i "$(cat /templates/supervisor.conf)" \
@@ -36,7 +36,6 @@ sigil -p -i "$(cat /templates/supervisor.conf)" \
 export INTERFACE=${VPNName:-tzk}
 
 #remove device if already exist
-ip route del ${KubernetesServiceCIDR:-10.96.0.0/12} dev $INTERFACE 
 ip route del ${Subnet:-10.187.0.0/16} dev $INTERFACE
 ip addr flush dev $INTERFACE
 ip link set $INTERFACE down
