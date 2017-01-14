@@ -1,7 +1,7 @@
 [Vpn]
 Name = "${VPNName:-tzk}"
 PublicKeyFile = "/etc/tinc/${VPNName:-tzk}/ed25519_key.pub"
-ExecRestart = "supervisorctl -s http://localhost:9001  restart tinc"
+ExecRestart = "/usr/bin/supervisorctl -s http://localhost:9001  restart tinc"
 Subnet = "${Subnet:-10.187.0.0/16}"
 
 [Consul]
