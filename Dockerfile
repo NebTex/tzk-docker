@@ -5,7 +5,7 @@ MAINTAINER Cristian Lozano "criloz@nebtex.com"
 ENV CONSUL_VERSION=0.7.2
 
 # This is the release of tzk-daemon to pull in.
-ENV TZKD_VERSION=0.1.1
+ENV TZKD_VERSION=0.2.0
 
 # This is the release of https://github.com/hashicorp/docker-base to pull in order
 # to provide HashiCorp-built versions of basic utilities like dumb-init and gosu.

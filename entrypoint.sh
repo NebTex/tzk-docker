@@ -27,6 +27,7 @@ sigil -p -i "$(cat /templates/tzk.toml)" \
     VPNName=${VPNName:-tzk} ACLToken=${ACLToken:?} master=${master:-false} \
     Subnet=${Subnet:-10.187.0.0/16} ConsulHost=${ConsulHost:?} \
     NodeIP=${NodeIP:-} \
+    PodSubnet=${PodSubnet:-}\
     > /etc/tzk.d/tzk.toml
 
 sigil -p -i "$(cat /templates/supervisor.conf)" \
@@ -40,4 +41,5 @@ ip route del ${Subnet:-10.187.0.0/16} dev $INTERFACE
 ip addr flush dev $INTERFACE
 ip link set $INTERFACE down
 
+/usr/sbin/tincd -n ${VPNName:-tzk} --pidfile=/etc/tinc/${VPNName:-tzk}/pid --logfile=/etc/tinc/${VPNName:-tzk}/tinc.logs
 /usr/bin/supervisord
