@@ -23,13 +23,6 @@ sigil -p -i "$(cat /templates/consul.json)" \
 fi
 chown consul:consul -R /consul
 
-sigil -p -i "$(cat /templates/tzk.toml)" \
-    VPNName=${VPNName:-tzk} ACLToken=${ACLToken:?} master=${master:-false} \
-    Subnet=${Subnet:-10.187.0.0/16} ConsulHost=${ConsulHost:?} \
-    NodeIP=${NodeIP:-} \
-    PodSubnet=${PodSubnet:-}\
-    > /etc/tzk.d/tzk.toml
-
 sigil -p -i "$(cat /templates/supervisor.conf)" \
     VPNName=${VPNName:-tzk} master=${master:-false} \
     > /etc/supervisor/conf.d/supervisord.conf
